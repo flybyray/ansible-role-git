@@ -22,11 +22,11 @@
 
 - name: Create directory for git configuration
   ansible.builtin.file:
-    path: /home/{{ git_username }}
+    path: "{{ getent_passwd[git_username][4] | default('/home/' ~ git_username) }}"
     state: directory
     owner: "{{ git_username | default(omit) }}"
     group: "{{ git_groupname | default(omit) }}"
-    mode: "0755"
+    mode: "0750"
   when:
     - getent_passwd is defined
     - getent_passwd[git_username] != none
@@ -34,7 +34,7 @@
 - name: Place git configuration
   ansible.builtin.template:
     src: gitconfig.j2
-    dest: /home/{{ git_username }}/.gitconfig
+    dest: "{{ getent_passwd[git_username][4] | default('/home/' ~ git_username) }}/.gitconfig"
     mode: "0644"
   when:
     - git_user_email is defined
